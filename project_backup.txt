@@ -1,0 +1,887 @@
+
+# Project Backup Instructions
+
+## Setting Up the Virtual Environment
+
+1. **Navigate to the backend directory:**
+    ```bash
+    cd backend
+    ```
+
+2. **Create a virtual environment:**
+    ```bash
+    python -m venv venv
+    ```
+
+3. **Activate the virtual environment:**
+    - **Windows:**
+        ```bash
+        venv\Scripts\activate
+        ```
+    - **macOS/Linux:**
+        ```bash
+        source venv/bin/activate
+        ```
+
+## Installing Dependencies
+
+1. **Upgrade pip:**
+    ```bash
+    pip install --upgrade pip
+    ```
+
+2. **Install FastAPI, Uvicorn, and other dependencies:**
+    ```bash
+    pip install fastapi uvicorn pymongo pymssql
+    ```
+
+3. **For the React frontend, navigate to the frontend directory and install npm packages:**
+    ```bash
+    cd ../my-website
+    npm install
+    ```
+
+## Starting the Backend and Frontend
+
+1. **Start the FastAPI backend:**
+    ```bash
+    cd backend
+    venv\Scripts\activate  # Activate the virtual environment if not already activated
+    uvicorn main:app --reload
+    ```
+    - The backend will be running at `http://127.0.0.1:8000`
+
+2. **Start the React frontend:**
+    ```bash
+    cd ../my-website
+    npm start
+    ```
+    - The frontend will open in your default browser at `http://localhost:3000`
+
+## Accessing the Application
+
+- **Empty Locations Page (API Endpoint):**
+    - URL: [http://127.0.0.1:8000/empty-locations](http://127.0.0.1:8000/empty-locations)
+
+- **React Frontend Homepage:**
+    - URL: [http://localhost:3000](http://localhost:3000)
+
+- **Other Pages:**
+    - **Vanilla Tool:** [http://localhost:3000/vanilla-tool](http://localhost:3000/vanilla-tool)
+    - **Dash Tool:** [http://127.0.0.1:8000/dash-tool](http://127.0.0.1:8000/dash-tool)
+    - **User Tool:** [http://localhost:3000/user-tool](http://localhost:3000/user-tool)
+
+## Restarting the Services
+
+- **To restart the backend or frontend, simply stop the running process (Ctrl+C in the terminal) and start them again using the commands above.**
+
+---
+
+
+
+=== File: backup_project.py ===
+
+import os
+
+# Define the root directory of your project
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Define the output file path
+OUTPUT_FILE = os.path.join(ROOT_DIR, 'project_backup.txt')
+
+# Define the file extensions you care about
+RELEVANT_EXTENSIONS = ['.py', '.js', '.jsx', '.css', '.html']
+
+# Define folders to exclude
+EXCLUDE_FOLDERS = ['venv', '__pycache__', '.git', 'node_modules']
+
+# Define setup instructions
+SETUP_INSTRUCTIONS = """
+# Project Backup Instructions
+
+## Setting Up the Virtual Environment
+
+1. **Navigate to the backend directory:**
+    ```bash
+    cd backend
+    ```
+
+2. **Create a virtual environment:**
+    ```bash
+    python -m venv venv
+    ```
+
+3. **Activate the virtual environment:**
+    - **Windows:**
+        ```bash
+        venv\\Scripts\\activate
+        ```
+    - **macOS/Linux:**
+        ```bash
+        source venv/bin/activate
+        ```
+
+## Installing Dependencies
+
+1. **Upgrade pip:**
+    ```bash
+    pip install --upgrade pip
+    ```
+
+2. **Install FastAPI, Uvicorn, and other dependencies:**
+    ```bash
+    pip install fastapi uvicorn pymongo pymssql
+    ```
+
+3. **For the React frontend, navigate to the frontend directory and install npm packages:**
+    ```bash
+    cd ../my-website
+    npm install
+    ```
+
+## Starting the Backend and Frontend
+
+1. **Start the FastAPI backend:**
+    ```bash
+    cd backend
+    venv\\Scripts\\activate  # Activate the virtual environment if not already activated
+    uvicorn main:app --reload
+    ```
+    - The backend will be running at `http://127.0.0.1:8000`
+
+2. **Start the React frontend:**
+    ```bash
+    cd ../my-website
+    npm start
+    ```
+    - The frontend will open in your default browser at `http://localhost:3000`
+
+## Accessing the Application
+
+- **Empty Locations Page (API Endpoint):**
+    - URL: [http://127.0.0.1:8000/empty-locations](http://127.0.0.1:8000/empty-locations)
+
+- **React Frontend Homepage:**
+    - URL: [http://localhost:3000](http://localhost:3000)
+
+- **Other Pages:**
+    - **Vanilla Tool:** [http://localhost:3000/vanilla-tool](http://localhost:3000/vanilla-tool)
+    - **Dash Tool:** [http://127.0.0.1:8000/dash-tool](http://127.0.0.1:8000/dash-tool)
+    - **User Tool:** [http://localhost:3000/user-tool](http://localhost:3000/user-tool)
+
+## Restarting the Services
+
+- **To restart the backend or frontend, simply stop the running process (Ctrl+C in the terminal) and start them again using the commands above.**
+
+---
+
+"""
+
+def is_relevant_file(filename):
+    _, ext = os.path.splitext(filename)
+    return ext in RELEVANT_EXTENSIONS
+
+def should_exclude_folder(folder_name):
+    return folder_name in EXCLUDE_FOLDERS
+
+def collect_files(root_dir):
+    collected_files = []
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Modify dirnames in-place to skip excluded folders
+        dirnames[:] = [d for d in dirnames if not should_exclude_folder(d)]
+        for filename in filenames:
+            if is_relevant_file(filename):
+                filepath = os.path.join(dirpath, filename)
+                collected_files.append(filepath)
+    return collected_files
+
+def write_backup_file(files, output_path, instructions):
+    with open(output_path, 'w', encoding='utf-8') as f:
+        # Write setup instructions
+        f.write(instructions)
+        f.write("\n\n")
+        
+        # Write each file's path and content
+        for file_path in files:
+            relative_path = os.path.relpath(file_path, ROOT_DIR)
+            f.write(f"=== File: {relative_path} ===\n\n")
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                f.write(content)
+            except Exception as e:
+                f.write(f"Error reading file: {e}\n")
+            f.write("\n\n")  # Add space between files
+
+def main():
+    print("Scanning project directory for relevant files...")
+    files = collect_files(ROOT_DIR)
+    print(f"Found {len(files)} relevant files.")
+    
+    print(f"Writing to {OUTPUT_FILE}...")
+    write_backup_file(files, OUTPUT_FILE, SETUP_INSTRUCTIONS)
+    print("Backup complete!")
+
+if __name__ == "__main__":
+    main()
+
+
+=== File: backend\main.py ===
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List
+from fastapi.middleware.cors import CORSMiddleware
+from dash_apps.dash_tool import dash_app  # Import the Dash app
+from starlette.middleware.wsgi import WSGIMiddleware  # Import WSGIMiddleware
+
+app = FastAPI()
+
+# CORS configuration for frontend communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# In-memory "database" with some sample data (both empty and occupied)
+locations = [
+    {"location_id": "L1", "status": "empty"},
+    {"location_id": "L2", "status": "occupied"},
+    {"location_id": "L3", "status": "empty"},
+    {"location_id": "L4", "status": "occupied"},
+    {"location_id": "L5", "status": "empty"},
+]
+
+# Pydantic model
+class Location(BaseModel):
+    location_id: str
+    status: str
+
+# Get all empty locations
+@app.get("/empty-locations", response_model=List[Location])
+def get_empty_locations():
+    empty_locations = [location for location in locations if location["status"] == "empty"]
+    return empty_locations
+
+# Get all locations (empty and occupied)
+@app.get("/all-locations", response_model=List[Location])
+def get_all_locations():
+    return locations
+
+# Add a new location
+@app.post("/empty-locations")
+def add_location(location: Location):
+    locations.append(location.dict())
+    return {"message": "Location added successfully"}
+
+# Delete a location by ID
+@app.delete("/empty-locations/{location_id}")
+def delete_location(location_id: str):
+    global locations
+    locations = [location for location in locations if location["location_id"] != location_id]
+    return {"message": "Location deleted successfully"}
+
+# Update a location's status
+@app.put("/empty-locations/{location_id}")
+def update_location(location_id: str, location: Location):
+    for loc in locations:
+        if loc["location_id"] == location_id:
+            loc["status"] = location.status
+            return {"message": "Location updated successfully"}
+    raise HTTPException(status_code=404, detail="Location not found")
+
+# Mount the Dash app using WSGIMiddleware
+app.mount("/dash-tool", WSGIMiddleware(dash_app.server))
+
+
+=== File: backend\dash_apps\dash_tool.py ===
+
+import dash
+from dash import dcc, html
+import plotly.graph_objs as go
+
+# Sample data
+data = {
+    'Fruits': ['Apples', 'Oranges', 'Bananas', 'Grapes'],
+    'Quantity': [5, 3, 8, 2]
+}
+
+# Create a Dash app
+dash_app = dash.Dash(__name__, requests_pathname_prefix='/dash-tool/')
+
+# Layout for the Dash app
+dash_app.layout = html.Div(children=[
+    html.H1('Fruit Quantities Bar Chart'),
+    
+    dcc.Graph(
+        id='bar-chart',
+        figure={
+            'data': [
+                go.Bar(
+                    x=data['Fruits'],
+                    y=data['Quantity'],
+                    name='Fruits'
+                )
+            ],
+            'layout': {
+                'title': 'Fruit Quantities',
+                'xaxis': {'title': 'Fruits'},
+                'yaxis': {'title': 'Quantity'}
+            }
+        }
+    )
+])
+
+# Run the Dash app
+app = dash_app.server
+
+
+=== File: backend\dash_apps\__init__.py ===
+
+
+
+=== File: my-website\public\index.html ===
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>
+
+
+=== File: my-website\public\vanilla-tool\index.html ===
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vanilla Tool</title>
+  <link rel="stylesheet" href="./style.css">  <!-- Correct path to CSS -->
+</head>
+<body>
+  <div id="container">
+    <h1 id="message">Hello, welcome to the Vanilla JS Tool!</h1>
+    <button id="changeTextButton">Change Text</button>
+  </div>
+  <script src="./script.js"></script>  <!-- Correct path to JS -->
+</body>
+</html>
+
+
+=== File: my-website\public\vanilla-tool\script.js ===
+
+document.getElementById("changeTextButton").addEventListener("click", function() {
+    const messageElement = document.getElementById("message");
+    messageElement.textContent = "Text changed! You're using vanilla JavaScript!";
+  });
+  
+
+=== File: my-website\public\vanilla-tool\style.css ===
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  #container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+
+=== File: my-website\src\App.css ===
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+=== File: my-website\src\App.js ===
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './components/Home/Home';
+import EmptyLocations from './components/EmptyLocations/EmptyLocations';
+import VanillaTool from './components/VanillaTool/VanillaTool';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/empty-locations" element={<EmptyLocations />} />
+        <Route path="/vanilla-tool" element={<VanillaTool />} />  {/* Vanilla JS tool */}
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+=== File: my-website\src\App.test.js ===
+
+import { render, screen } from '@testing-library/react';
+import App from './App';
+
+test('renders learn react link', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
+});
+
+
+=== File: my-website\src\index.css ===
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+=== File: my-website\src\index.js ===
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+
+=== File: my-website\src\reportWebVitals.js ===
+
+const reportWebVitals = onPerfEntry => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
+    });
+  }
+};
+
+export default reportWebVitals;
+
+
+=== File: my-website\src\setupTests.js ===
+
+// jest-dom adds custom jest matchers for asserting on DOM nodes.
+// allows you to do things like:
+// expect(element).toHaveTextContent(/react/i)
+// learn more: https://github.com/testing-library/jest-dom
+import '@testing-library/jest-dom';
+
+
+=== File: my-website\src\components\EmptyLocations\EmptyLocations.css ===
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  h2 {
+    margin-top: 20px;
+    color: #555;
+  }
+  
+  .add-location {
+    margin-bottom: 20px;
+  }
+  
+  .add-location input, .add-location select {
+    padding: 8px;
+    margin-right: 10px;
+  }
+  
+  button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #218838;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  table, th, td {
+    border: 1px solid #ccc;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+  }
+  
+  ul {
+    list-style-type: none;
+  }
+  
+  li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+
+=== File: my-website\src\components\EmptyLocations\EmptyLocations.js ===
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './EmptyLocations.css';
+
+function EmptyLocations() {
+  const [locations, setLocations] = useState([]);
+  const [allLocations, setAllLocations] = useState([]);
+  const [newLocation, setNewLocation] = useState({ location_id: "", status: "empty" });
+
+  // Fetch all locations
+  useEffect(() => {
+    axios.get('http://127.0.0.1:8000/all-locations')
+      .then(response => {
+        console.log('All Locations:', response.data);  // Debugging
+        setAllLocations(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching all locations:', error);
+      });
+
+    axios.get('http://127.0.0.1:8000/empty-locations')
+      .then(response => {
+        console.log('Empty Locations:', response.data);  // Debugging
+        setLocations(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching empty locations:', error);
+      });
+  }, []);
+
+  // Add new location
+  const addLocation = () => {
+    if (newLocation.location_id === "") {
+      alert("Location ID cannot be empty.");
+      return;
+    }
+    axios.post('http://127.0.0.1:8000/empty-locations', newLocation)
+      .then(() => {
+        setAllLocations([...allLocations, newLocation]);
+        if (newLocation.status === 'empty') {
+          setLocations([...locations, newLocation]);
+        }
+        setNewLocation({ location_id: "", status: "empty" });
+      })
+      .catch(error => {
+        console.error('Error adding new location:', error);
+      });
+  };
+
+  // Delete location
+  const deleteLocation = (location_id) => {
+    axios.delete(`http://127.0.0.1:8000/empty-locations/${location_id}`)
+      .then(() => {
+        setAllLocations(allLocations.filter(loc => loc.location_id !== location_id));
+        setLocations(locations.filter(loc => loc.location_id !== location_id));
+      })
+      .catch(error => {
+        console.error('Error deleting location:', error);
+      });
+  };
+
+  // Update location status
+  const updateLocation = (location_id, status) => {
+    axios.put(`http://127.0.0.1:8000/empty-locations/${location_id}`, { location_id, status })
+      .then(() => {
+        setAllLocations(allLocations.map(loc => 
+          loc.location_id === location_id ? { ...loc, status } : loc));
+        if (status === "empty") {
+          setLocations([...locations, { location_id, status }]);
+        } else {
+          setLocations(locations.filter(loc => loc.location_id !== location_id));
+        }
+      })
+      .catch(error => {
+        console.error('Error updating location status:', error);
+      });
+  };
+
+  return (
+    <div className="container">
+      <h1>Location Manager</h1>
+      <div className="add-location">
+        <input
+          type="text"
+          placeholder="Location ID"
+          value={newLocation.location_id}
+          onChange={(e) => setNewLocation({ ...newLocation, location_id: e.target.value })}
+        />
+        <select
+          value={newLocation.status}
+          onChange={(e) => setNewLocation({ ...newLocation, status: e.target.value })}
+        >
+          <option value="empty">Empty</option>
+          <option value="occupied">Occupied</option>
+        </select>
+        <button onClick={addLocation}>Add Location</button>
+      </div>
+      <h2>All Locations</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Location ID</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allLocations.map((location, index) => (
+            <tr key={index}>
+              <td>{location.location_id}</td>
+              <td>{location.status}</td>
+              <td>
+                <button onClick={() => updateLocation(location.location_id, location.status === 'empty' ? 'occupied' : 'empty')}>
+                  {location.status === 'empty' ? 'Occupy' : 'Empty'}
+                </button>
+                <button onClick={() => deleteLocation(location.location_id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h2>Empty Locations</h2>
+      <ul>
+        {locations.map((location, index) => (
+          <li key={index}>{location.location_id}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default EmptyLocations;
+
+
+=== File: my-website\src\components\Home\Home.css ===
+
+.home-container {
+    text-align: center;
+    margin-top: 100px;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: #333;
+  }
+  
+  p {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  button.btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button.btn:hover {
+    background-color: #0056b3;
+  }
+  
+
+=== File: my-website\src\components\Home\Home.js ===
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Home.css';
+
+function Home() {
+  return (
+    <div className="home-container">
+      <h1>Welcome to the Warehouse Manager</h1>
+      <p>Click a button below to navigate.</p>
+      <Link to="/empty-locations">
+        <button className="btn">Go to Empty Locations</button>
+      </Link>
+      <Link to="/vanilla-tool">
+        <button className="btn">Go to Vanilla Tool</button>
+      </Link>
+      {/* Link to the Dash tool */}
+      <a href="http://127.0.0.1:8000/dash-tool">
+        <button className="btn">Go to Dash Tool</button>
+      </a>
+    </div>
+  );
+}
+
+export default Home;
+
+
+=== File: my-website\src\components\VanillaTool\VanillaTool.js ===
+
+import React from 'react';
+
+function VanillaTool() {
+  return (
+    <div style={{ width: '100%', height: '100vh', border: 'none' }}>
+      <iframe
+        title="Vanilla Tool"
+        src="/vanilla-tool/index.html"
+        style={{ width: '100%', height: '100%', border: 'none' }}
+      />
+    </div>
+  );
+}
+
+export default VanillaTool;
+
+

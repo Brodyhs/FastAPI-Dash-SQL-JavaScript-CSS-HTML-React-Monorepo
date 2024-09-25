@@ -1,0 +1,11 @@
+# Exclude Python virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# Exclude Node modules
+node_modules/
+
+# Exclude editor-specific or OS-specific files
+.DS_Store
+.vscode/
