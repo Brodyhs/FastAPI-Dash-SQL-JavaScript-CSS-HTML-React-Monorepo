@@ -4,6 +4,7 @@ from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from dash_apps.dash_tool import dash_app  # Import the Dash app
 from starlette.middleware.wsgi import WSGIMiddleware  # Import WSGIMiddleware
+from sql.sql import get_all_users, add_user  # Import SQL functions
 
 app = FastAPI()
 
@@ -16,6 +17,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---------------------------------------------
+# Location Management Endpoints
+# ---------------------------------------------
+
 # In-memory "database" with some sample data (both empty and occupied)
 locations = [
     {"location_id": "L1", "status": "empty"},
@@ -25,7 +30,7 @@ locations = [
     {"location_id": "L5", "status": "empty"},
 ]
 
-# Pydantic model
+# Pydantic model for locations
 class Location(BaseModel):
     location_id: str
     status: str
@@ -62,6 +67,37 @@ def update_location(location_id: str, location: Location):
             loc["status"] = location.status
             return {"message": "Location updated successfully"}
     raise HTTPException(status_code=404, detail="Location not found")
+
+# ---------------------------------------------
+# User Management Endpoints (SQL-based)
+# ---------------------------------------------
+
+# Pydantic model for the User data
+class User(BaseModel):
+    name: str
+    age: int
+
+# Endpoint to get all users from SQL database
+@app.get("/users")
+def read_users():
+    try:
+        users = get_all_users()
+        return users
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Endpoint to add a new user to SQL database
+@app.post("/users")
+def create_user(user: User):
+    try:
+        add_user(user.name, user.age)
+        return {"message": "User added successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ---------------------------------------------
+# Dash Tool Integration
+# ---------------------------------------------
 
 # Mount the Dash app using WSGIMiddleware
 app.mount("/dash-tool", WSGIMiddleware(dash_app.server))
