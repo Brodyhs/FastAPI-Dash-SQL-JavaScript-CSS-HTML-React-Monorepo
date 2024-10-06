@@ -1,4 +1,29 @@
-# Project Backup Instructions
+# Project Setup Instructions
+
+## Setting Up MS SQL
+
+1. **Create table in MS SQL (A schema might be needed):**
+
+    ```
+
+    CREATE TABLE Users (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    name NVARCHAR(100),
+    age INT
+    );
+
+    ```
+2. **Update sql.py file placeholder credentials**
+
+    ```
+
+    SERVER = 'your_server'
+    DATABASE = 'your_database'
+    PORT = 'your_port'
+    USERNAME = 'your_username'
+    PASSWORD = 'your_password'
+
+    ```
 
 ## Setting Up the Virtual Environment
 
@@ -22,7 +47,7 @@
         source venv/bin/activate
         ```
 
-## Installing Dependencies
+## Installing Dependencies (There are other dependencies to install beyond fastapi and pylssql, such as dash)
 
 1. **Upgrade pip:**
     ```bash
